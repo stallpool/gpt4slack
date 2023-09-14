@@ -26,3 +26,47 @@ bot scope:
 - `im:history`
 - `mpim:history`
 
+### How to add your prompt
+
+In the code
+```
+... messages=[{ ... }, ...]
+```
+you need to add first message as a prompt like:
+```
+messages = [{ role: 'system', content: prompt } ...]
+```
+
+### How to let gpt provide defined json format output
+
+besides `messages`, add keys:
+```
+   messages: [...],
+   functions: [{ name: 'jsonify', parameters: param }],
+   function_call: { name: 'jsonify' }
+```
+
+you need to define json format in `param` like:
+```
+   type: 'object',
+   properties: {
+      company_entities: {
+         type: 'array',
+         items: {
+            type: 'object',
+            properties: {
+               name: {
+                  type: 'string',
+                  minLength: 2,
+                  maxLength: 100,
+                  description: 'the name of entity',
+               },
+            },
+         },
+         description: 'all named entities extracted from the input text',
+      },
+   },
+```
+
+and in your `prompt` you can ask gpt to call `jsonify` to parse result.
+then you can get formated result at for example `.choices[0].message.function_call.arguments`
